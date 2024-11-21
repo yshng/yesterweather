@@ -21,7 +21,6 @@ export function Precipitation({precip, precipY, preciptype, preciptypeY, precipp
   const typeString = listWithAnd(preciptype);
   const typeStringY = listWithAnd(preciptypeY);
 
-  console.log(precipprob);
   return (
     <Card header="Precipitation" id="precip">
       <p>

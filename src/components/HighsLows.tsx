@@ -9,6 +9,7 @@ interface HighsLowsProps {
 }
 
 export function HighsLows({feelslikemax, feelslikemaxY, feelslikemin, feelslikeminY}: HighsLowsProps) {
+  
   return (
     <Card header="highs and lows" id="highslows">
       <p>The high today is <CompareTemp difference={feelslikemax-feelslikemaxY} /> than yesterday. The low today is <CompareTemp difference={feelslikemin-feelslikeminY} /> than yesterday.</p>

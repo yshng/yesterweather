@@ -4,7 +4,10 @@ import { Summary } from "./Summary";
 import { HighsLows } from "./HighsLows";
 import { Precipitation } from "./Precipitation";
 
-// interface WeatherContainerProps {location: string;}
+interface WeatherContainerProps {
+  location: string;
+  unitGroup: string;
+}
 
 export interface WeatherData {
   datetime: string;
@@ -23,12 +26,10 @@ export interface WeatherData {
   hours: WeatherData[];
 }
 
-export function WeatherContainer() {
+export function WeatherContainer({location, unitGroup}: WeatherContainerProps) {
+
   const [todayData, setTodayData] = useState<WeatherData>();
   const [yesData, setYesData] = useState<WeatherData>();
-
-  const endpoint = (days: string) =>
-    `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/chicago/${days}?unitGroup=us&include=days%2Chours&key=66335529NH8DXDCDHH6X2KXW3&contentType=json`;
 
   function formatDate(date: Date) {
     return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-");
@@ -36,6 +37,10 @@ export function WeatherContainer() {
 
   // api call
   useEffect(() => {
+
+    const endpoint = (days: string) =>
+      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=days%2Chours&key=66335529NH8DXDCDHH6X2KXW3&contentType=json`;
+
     const now = new Date();
     const today = formatDate(now);
     now.setDate(now.getDate() - 1);
@@ -51,7 +56,7 @@ export function WeatherContainer() {
         console.log("fetched");
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [unitGroup, location]);
 
   if (!todayData || !yesData) {
     return <p> Problem getting weather data. </p>;

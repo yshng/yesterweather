@@ -26,32 +26,6 @@ h1 {
   margin-bottom: 2rem;
 }
 
-.card-wrapper {
-  margin: 0 auto;
-  display: flex;
-  flex-flow: row wrap; 
-  gap: 20px;
-}
-
-.card {
-  flex: 0 1 350px;
-  background-color: #ffffff66;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-.card > h1 {
-  font-size: 1rem;
-  font-weight: 500;
-  font-variant: all-petite-caps;
-  color: #757575;
-  margin-bottom: 1rem;
-}
-
-.card > p {
-  margin: 10px 0;
-}
-
 .warmer, .cooler {
   font-weight: 500;
 }
@@ -63,4 +37,38 @@ h1 {
 
 .cooler {
   color: var(--cooler);
+}
+
+.hour-by-hour, .card {
+  background-color: #ffffff66;
+}
+
+.card-wrapper, .hour-by-hour {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.card-wrapper {
+  display: flex;
+  flex-flow: row wrap; 
+  gap: 20px;
+}
+
+.card {
+  flex: 1 1 250px;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.card > h1, .hour-by-hour > h1 {
+  font-size: 1rem;
+  font-weight: 500;
+  font-variant: all-petite-caps;
+  color: #757575;
+  margin-bottom: 1rem;
+}
+
+.card > p {
+  margin: 10px 0;
 }

@@ -1,4 +1,6 @@
 import { Card } from "./Card";
+import { UnitContext } from "./UnitContext";
+import { useContext } from "react";
 
 interface SummaryProps {
   description: string;
@@ -9,9 +11,12 @@ interface SummaryProps {
 }
 
 export function Summary( {description, feelslikemax, feelslikemin, tempmax, tempmin}: SummaryProps) {
+
+  const units = useContext(UnitContext);
+
   return (
     <Card header="today" id="summary">
-      <p>{description} High of {feelslikemax}°F [{tempmax}], low of {feelslikemin}°F [{tempmin}].</p>
+      <p>{description} High of {feelslikemax}{units} [{tempmax}], low of {feelslikemin}{units} [{tempmin}].</p>
     </Card>
     )
 }
