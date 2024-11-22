@@ -16,7 +16,7 @@ export function Summary( {description, feelslikemax, feelslikemin, tempmax, temp
 
   return (
     <Card header="today" id="summary">
-      <p>{description} High of {feelslikemax}{units} [{tempmax}], low of {feelslikemin}{units} [{tempmin}].</p>
+      <p>{description} High of {feelslikemax}{units.temp} [{tempmax}], low of {feelslikemin}{units.temp} [{tempmin}].</p>
     </Card>
     )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Current } from "./Current";
+import { CurrentTemp } from "./CurrentTemp";
 import { Summary } from "./Summary";
 import { HighsLows } from "./HighsLows";
 import { Precipitation } from "./Precipitation";
@@ -26,10 +26,13 @@ export interface WeatherData {
   hours: WeatherData[];
 }
 
-export function WeatherContainer({location, unitGroup}: WeatherContainerProps) {
-
-  const [todayData, setTodayData] = useState<WeatherData>();
+export function WeatherContainer({
+  location,
+  unitGroup,
+}: WeatherContainerProps) {
   const [yesData, setYesData] = useState<WeatherData>();
+  const [todayData, setTodayData] = useState<WeatherData>();
+  const [tomData, setTomData] = useState<WeatherData>();
 
   function formatDate(date: Date) {
     return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-");
@@ -37,30 +40,35 @@ export function WeatherContainer({location, unitGroup}: WeatherContainerProps) {
 
   // api call
   useEffect(() => {
+    const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
 
     const endpoint = (days: string) =>
-      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=days%2Chours&key=66335529NH8DXDCDHH6X2KXW3&contentType=json`;
+      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=days%2Chours%2Ccurrent&key=${key}&contentType=json`;
 
     const now = new Date();
-    const today = formatDate(now);
+    //const today = formatDate(now);
     now.setDate(now.getDate() - 1);
     const yesterday = formatDate(now);
+    now.setDate(now.getDate() + 2);
+    const tomorrow = formatDate(now);
 
-    fetch(endpoint(yesterday + "/" + today), {
+    fetch(endpoint(yesterday + "/" + tomorrow), {
       mode: "cors",
     })
       .then((response) => response.json())
       .then((data) => {
         setYesData(data.days[0]);
         setTodayData(data.days[1]);
+        setTomData(data.days[2]);
         console.log("fetched");
       })
       .catch((error) => console.log(error));
   }, [unitGroup, location]);
 
-  if (!todayData || !yesData) {
+  if (!todayData || !yesData || !tomData) {
     return <p> Problem getting weather data. </p>;
   }
+
   const now = new Date();
   const currentHour = now.getHours();
   const {
@@ -69,17 +77,24 @@ export function WeatherContainer({location, unitGroup}: WeatherContainerProps) {
     feelslikemin,
     tempmax,
     tempmin,
+    temp,
     description,
     precipprob,
     preciptype,
-    precip
+    precip,
   } = todayData;
 
-  const yesCurrentFeelslike = yesData.hours[currentHour].feelslike;
+  const currentFeelslikeY = yesData.hours[currentHour].feelslike;
+  const currentFeelslikeT = tomData.hours[currentHour].feelslike;
 
   return (
     <>
-      <Current feelslike={feelslike} yesFeelslike={yesCurrentFeelslike} />
+      <CurrentTemp
+        feelslike={feelslike}
+        temp={temp}
+        feelslikeY={currentFeelslikeY}
+        feelslikeT={currentFeelslikeT}
+      />
       <Summary
         description={description}
         feelslikemax={feelslikemax}
@@ -92,13 +107,18 @@ export function WeatherContainer({location, unitGroup}: WeatherContainerProps) {
         feelslikemin={feelslikemin}
         feelslikemaxY={yesData.feelslikemax}
         feelslikeminY={yesData.feelslikemin}
+        feelslikemaxT={tomData.feelslikemax}
+        feelslikeminT={tomData.feelslikemin}
       />
-      <Precipitation 
+      <Precipitation
         precip={precip}
         precipY={yesData.precip}
         precipprob={precipprob}
+        precipprobT={tomData.precipprob}
+        preciptypeT={tomData.preciptype}
         preciptype={preciptype}
         preciptypeY={yesData.preciptype}
+        precipT={tomData.precip}
       />
     </>
   );
