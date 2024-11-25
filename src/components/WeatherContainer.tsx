@@ -1,125 +1,107 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { timestamp } from "./DateTime";
+import { DailyEntry, getHourlyData, HourlyEntry } from "../api/api";
 import { CurrentTemp } from "./CurrentTemp";
+import { addDays, roundToNearestHours } from "date-fns";
 import { Summary } from "./Summary";
-import { HighsLows } from "./HighsLows";
-import { Precipitation } from "./Precipitation";
+//import { HighsLows } from "./HighsLows";
+//import { Precipitation } from "./Precipitation";
 
 interface WeatherContainerProps {
   location: string;
   unitGroup: string;
 }
 
-export interface WeatherData {
-  datetime: string;
-  conditions: string;
-  description: string;
-  feelslike: number;
-  feelslikemax: number;
-  feelslikemin: number;
-  temp: number;
-  tempmax: number;
-  tempmin: number;
-  precipprob: number;
-  precip: number;
-  preciptype: string[];
-  icon: string;
-  hours: WeatherData[];
-}
-
 export function WeatherContainer({
   location,
   unitGroup,
 }: WeatherContainerProps) {
-  const [yesData, setYesData] = useState<WeatherData>();
-  const [todayData, setTodayData] = useState<WeatherData>();
-  const [tomData, setTomData] = useState<WeatherData>();
+  const [dailyY, setDailyY] = useState<DailyEntry>();
+  const [dailyToday, setDailyToday] = useState<DailyEntry>();
+  const [dailyT, setDailyT] = useState<DailyEntry>();
+  const [hourlyNowAndFuture, setHourlyNowAndFuture] = useState<HourlyEntry[]>();
+  const [hourlyPast24, setHourlyPast24] = useState<HourlyEntry[]>();
 
-  function formatDate(date: Date) {
-    return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-");
-  }
+
+  const effectRan = useRef(false);
 
   // api call
   useEffect(() => {
-    const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
 
-    const endpoint = (days: string) =>
-      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=days%2Chours%2Ccurrent&key=${key}&contentType=json`;
+    if (effectRan.current || process.env.NODE_ENV !== "development") {
+      console.log("effect applied only on REmount");
 
-    const now = new Date();
-    //const today = formatDate(now);
-    now.setDate(now.getDate() - 1);
-    const yesterday = formatDate(now);
-    now.setDate(now.getDate() + 2);
-    const tomorrow = formatDate(now);
+      const options = {method: 'GET', headers: {accept: 'application/json'}};
 
-    fetch(endpoint(yesterday + "/" + tomorrow), {
-      mode: "cors",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setYesData(data.days[0]);
-        setTodayData(data.days[1]);
-        setTomData(data.days[2]);
-        console.log("fetched");
-      })
-      .catch((error) => console.log(error));
-  }, [unitGroup, location]);
+      //weather recent history API call for yesterday's data
 
-  if (!todayData || !yesData || !tomData) {
+      fetch(`https://api.tomorrow.io/v4/weather/history/recent?location=${location}&timesteps=1d&timesteps=1h&units=${unitGroup}&apikey=hhiYAnl3OSZAtRCty853300PftrNwH9v`, options)
+        .then(res => res.json())
+        .then(res => {
+          setDailyY(res["timelines"]["daily"][0]);
+          setHourlyPast24(res["timelines"]["hourly"]);
+        })
+        .catch(err => console.error(err));
+
+      //weather forecast call for today and future data
+
+      fetch(`https://api.tomorrow.io/v4/weather/forecast?location=${location}&timesteps=1d&timesteps=1h&units=${unitGroup}&apikey=hhiYAnl3OSZAtRCty853300PftrNwH9v`, options)
+        .then(res => res.json())
+        .then(res => {
+          setDailyToday(res["timelines"]["daily"][0]);
+          setDailyT(res["timelines"]["daily"][1]);
+          setHourlyNowAndFuture(res["timelines"]["hourly"]);
+        })
+        .catch(err => console.error(err));
+
+      }
+    
+      effectRan.current = true;
+
+  }, [location, unitGroup])
+
+  if (!dailyToday || !dailyY || !dailyT || !hourlyNowAndFuture || !hourlyPast24) {
     return <p> Problem getting weather data. </p>;
   }
-
+  
   const now = new Date();
-  const currentHour = now.getHours();
-  const {
-    feelslike,
-    feelslikemax,
-    feelslikemin,
-    tempmax,
-    tempmin,
-    temp,
-    description,
-    precipprob,
-    preciptype,
-    precip,
-  } = todayData;
-
-  const currentFeelslikeY = yesData.hours[currentHour].feelslike;
-  const currentFeelslikeT = tomData.hours[currentHour].feelslike;
+  const nearestHour = roundToNearestHours(now);
+  const timeString = timestamp(nearestHour);
+  const timeStringT = timestamp(addDays(nearestHour,1));
+  const today = dailyToday.values;
 
   return (
     <>
       <CurrentTemp
-        feelslike={feelslike}
-        temp={temp}
-        feelslikeY={currentFeelslikeY}
-        feelslikeT={currentFeelslikeT}
+        feelslike={getHourlyData(hourlyNowAndFuture,timeString,"temperatureApparent")}
+        temp={getHourlyData(hourlyNowAndFuture,timeString,"temperature")}
+        feelslikeY={hourlyPast24[0]["values"]["temperatureApparent"]}
+        feelslikeT={getHourlyData(hourlyNowAndFuture,timeStringT, "temperatureApparent")}
       />
       <Summary
-        description={description}
-        feelslikemax={feelslikemax}
-        feelslikemin={feelslikemin}
-        tempmax={tempmax}
-        tempmin={tempmin}
-      />
+        feelslikemax={today.temperatureApparentMax}
+        feelslikemin={today.temperatureApparentMin}
+        tempmax={today.temperatureMax}
+        tempmin={today.temperatureMin}
+      />{/*
       <HighsLows
         feelslikemax={feelslikemax}
         feelslikemin={feelslikemin}
-        feelslikemaxY={yesData.feelslikemax}
-        feelslikeminY={yesData.feelslikemin}
+        feelslikemaxY={DailyY.feelslikemax}
+        feelslikeminY={DailyY.feelslikemin}
         feelslikemaxT={tomData.feelslikemax}
         feelslikeminT={tomData.feelslikemin}
       />
       <Precipitation
         precip={precip}
-        precipY={yesData.precip}
+        precipY={DailyY.precip}
         precipprob={precipprob}
         precipprobT={tomData.precipprob}
         preciptypeT={tomData.preciptype}
         preciptype={preciptype}
-        preciptypeY={yesData.preciptype}
+        preciptypeY={DailyY.preciptype}
         precipT={tomData.precip}
-      />
+      />*/}
     </>
   );
 }

@@ -6,23 +6,23 @@ import { UnitContext } from "./components/UnitContext";
 import { LocationInput } from "./components/LocationInput"; 
 
 function App() {
-  const initialLocation = localStorage.getItem("location") || "chicago";
-  const initialUnitGroup = localStorage.getItem("unitGroup") || "us";
+  const initialLocation = localStorage.getItem("yesterweather_location") || "chicago";
+  const initialUnitGroup = localStorage.getItem("yesterweather_unitGroup") || "imperial";
 
   const [unitGroup, setUnitGroup] = useState(initialUnitGroup);
   const [location, setLocation] = useState(initialLocation);
 
   function toggleUnitGroup() {
-    if (unitGroup == "us") { 
+    if (unitGroup == "imperial") { 
       setUnitGroup("metric")
-      localStorage.setItem("unitGroup", "metric")
+      localStorage.setItem("yesterweather_unitGroup", "metric")
      } else {
-      setUnitGroup("us");
-      localStorage.setItem("unitGroup","us")
+      setUnitGroup("imperial");
+      localStorage.setItem("yesterweather_unitGroup","imperial")
      } 
   }
 
-  const units = unitGroup == "us" ? {temp: "°F", depth: "in."} : {temp: "°C", depth: "mm"};
+  const units = unitGroup == "imperial" ? {temp: "°F", depth: "in."} : {temp: "°C", depth: "mm"};
 
   return (
     <StrictMode>
