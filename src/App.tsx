@@ -22,24 +22,23 @@ function App() {
      } 
   }
 
-  const units = unitGroup == "us" ? {temp: "°F", depth: "in."} : {temp: "°C", depth: "mm"};
+  const units = unitGroup == "us" ? {temp: "°F", depth: {unit: "inch", plural: "inches"}} : {temp: "°C", depth: {unit: "mm", plural: "mms"}};
 
   return (
     <StrictMode>
       <UnitContext.Provider value={units}>
-        <h1>YesterWeather</h1>
-        <LocationInput value={location} onSubmit={(x) => setLocation(x)}/>
-        <Button
-          type="button"
-          label={unitGroup}
-          id="unit-toggle-button"
-          onClick={() => {
-            toggleUnitGroup();
-          }}
-        />
-        <div className="card-wrapper">
-          <WeatherContainer unitGroup={unitGroup} location={location} />
-        </div>
+        <WeatherContainer unitGroup={unitGroup} location={location}>
+          <h1>YesterWeather</h1>
+          <LocationInput value={location} onSubmit={(x) => setLocation(x)}/>
+          <Button
+            type="button"
+            label={unitGroup}
+            id="unit-toggle-button"
+            onClick={() => {
+              toggleUnitGroup();
+            }}
+          />
+        </WeatherContainer>
       </UnitContext.Provider>
     </StrictMode>
   );

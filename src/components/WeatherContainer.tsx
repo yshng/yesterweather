@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { CurrentTemp } from "./CurrentTemp";
 import { Summary } from "./Summary";
 import { HighsLows } from "./HighsLows";
@@ -7,6 +7,7 @@ import { Precipitation } from "./Precipitation";
 interface WeatherContainerProps {
   location: string;
   unitGroup: string;
+  children: React.ReactNode;
 }
 
 export interface WeatherData {
@@ -26,100 +27,76 @@ export interface WeatherData {
   hours: WeatherData[];
 }
 
+export interface WeatherCardProps {
+    yesterday: WeatherData;
+    today: WeatherData;
+    tomorrow: WeatherData;
+    current: WeatherData;
+}
+
 export function WeatherContainer({
   location,
   unitGroup,
+  children,
 }: WeatherContainerProps) {
   const [yesData, setYesData] = useState<WeatherData>();
   const [todayData, setTodayData] = useState<WeatherData>();
   const [tomData, setTomData] = useState<WeatherData>();
+  const [currentData, setCurrentData] = useState<WeatherData>();
 
   function formatDate(date: Date) {
     return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-");
   }
 
+  const effectRan = useRef(false);
+
   // api call
   useEffect(() => {
-    const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
 
-    const endpoint = (days: string) =>
-      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=days%2Chours%2Ccurrent&key=${key}&contentType=json`;
+    if (effectRan.current || process.env.NODE_ENV !== "development") {
 
-    const now = new Date();
-    //const today = formatDate(now);
-    now.setDate(now.getDate() - 1);
-    const yesterday = formatDate(now);
-    now.setDate(now.getDate() + 2);
-    const tomorrow = formatDate(now);
+      const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
 
-    fetch(endpoint(yesterday + "/" + tomorrow), {
-      mode: "cors",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setYesData(data.days[0]);
-        setTodayData(data.days[1]);
-        setTomData(data.days[2]);
-        console.log("fetched");
+      const endpoint = (days: string) =>
+        `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=current%2Chours%2Cdays&key=${key}&contentType=json`;
+
+      const now = new Date();
+      //const today = formatDate(now);
+      now.setDate(now.getDate() - 1);
+      const yesterday = formatDate(now);
+      now.setDate(now.getDate() + 2);
+      const tomorrow = formatDate(now);
+
+      fetch(endpoint(yesterday + "/" + tomorrow), {
+        mode: "cors",
       })
-      .catch((error) => console.log(error));
+        .then((response) => response.json())
+        .then((data) => {
+          setYesData(data.days[0]);
+          setTodayData(data.days[1]);
+          setTomData(data.days[2]);
+          setCurrentData(data.currentConditions);
+          console.log("fetched");
+        })
+        .catch((error) => console.log(error));
+      } 
+
+      effectRan.current = true;
   }, [unitGroup, location]);
 
-  if (!todayData || !yesData || !tomData) {
+  if (!todayData || !yesData || !tomData || !currentData) {
     return <p> Problem getting weather data. </p>;
   }
 
-  const now = new Date();
-  const currentHour = now.getHours();
-  const {
-    feelslike,
-    feelslikemax,
-    feelslikemin,
-    tempmax,
-    tempmin,
-    temp,
-    description,
-    precipprob,
-    preciptype,
-    precip,
-  } = todayData;
-
-  const currentFeelslikeY = yesData.hours[currentHour].feelslike;
-  const currentFeelslikeT = tomData.hours[currentHour].feelslike;
+  const weather = {current: currentData, yesterday: yesData, today: todayData, tomorrow: tomData};
 
   return (
-    <>
-      <CurrentTemp
-        feelslike={feelslike}
-        temp={temp}
-        feelslikeY={currentFeelslikeY}
-        feelslikeT={currentFeelslikeT}
-      />
-      <Summary
-        description={description}
-        feelslikemax={feelslikemax}
-        feelslikemin={feelslikemin}
-        tempmax={tempmax}
-        tempmin={tempmin}
-      />
-      <HighsLows
-        feelslikemax={feelslikemax}
-        feelslikemin={feelslikemin}
-        feelslikemaxY={yesData.feelslikemax}
-        feelslikeminY={yesData.feelslikemin}
-        feelslikemaxT={tomData.feelslikemax}
-        feelslikeminT={tomData.feelslikemin}
-      />
-      <Precipitation
-        precip={precip}
-        precipY={yesData.precip}
-        precipprob={precipprob}
-        precipprobT={tomData.precipprob}
-        preciptypeT={tomData.preciptype}
-        preciptype={preciptype}
-        preciptypeY={yesData.preciptype}
-        precipT={tomData.precip}
-      />
-    </>
+    <div id="weather-container">
+        {children}
+        <CurrentTemp {...weather} />
+        <HighsLows {...weather} />
+        <Summary {...weather} />
+        <Precipitation {...weather} />
+    </div>
   );
 }
