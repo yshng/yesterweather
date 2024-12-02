@@ -1,10 +1,10 @@
 import { Card } from "./Card";
 import { UnitContext } from "./UnitContext";
 import { useContext } from "react";
-import { WeatherCardProps } from "./WeatherContainer";
+import { WeatherProps } from "./WeatherContainer";
 import { CompareTemp } from "./CompareTemp";
 
-export function Summary( {yesterday,today, tomorrow}: WeatherCardProps) {
+export function Summary( {yesterday,today, tomorrow}: WeatherProps) {
 
   const units = useContext(UnitContext);
 

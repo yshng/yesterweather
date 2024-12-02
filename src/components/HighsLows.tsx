@@ -1,8 +1,8 @@
 import { CompareTemp } from "./CompareTemp";
 import { Card } from "./Card";
-import { WeatherCardProps } from "./WeatherContainer";
+import { WeatherProps } from "./WeatherContainer";
 
-export function HighsLows({yesterday, today, tomorrow}: WeatherCardProps) {
+export function HighsLows({yesterday, today, tomorrow}: WeatherProps) {
   
   return (
     <Card header="highs and lows" id="highslows">

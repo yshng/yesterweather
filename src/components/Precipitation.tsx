@@ -1,9 +1,9 @@
 import { useContext } from "react";
 import { Card } from "./Card";
 import { UnitContext } from "./UnitContext";
-import { WeatherCardProps } from "./WeatherContainer";
+import { WeatherProps } from "./WeatherContainer";
 
-function listWithAnd(arr: string[]) {
+function listWithAnd(arr: string[] | null) {
   if (!arr) return null;
   if (arr.length > 2) {
     const allbut = arr.slice(0, arr.length - 1);
@@ -24,7 +24,7 @@ export function Precipitation({
   yesterday,
   today,
   tomorrow,
-}: WeatherCardProps) {
+}: WeatherProps) {
   const units = useContext(UnitContext);
 
   const typeString = listWithAnd(today.preciptype);
