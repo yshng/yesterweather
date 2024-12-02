@@ -1,16 +1,9 @@
-import { MouseEventHandler } from "react";
+import { ButtonHTMLAttributes } from "react";
 
-interface ButtonProps {
-  label: string;
-  onClick: MouseEventHandler;
-  type: string;
-  id: string;
-}
-
-export function Button({ id, label, onClick }: ButtonProps) {
+export function Button({ id, content, type, onClick }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button type="button" onClick={onClick} id={id}>
-      {label}
+    <button type={type} onClick={onClick} id={id}>
+      {content}
     </button>
   );
 }
