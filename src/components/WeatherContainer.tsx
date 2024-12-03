@@ -6,6 +6,7 @@ import { HighsLows } from "./HighsLows";
 import { Summary } from "./Summary";
 import { Precipitation } from "./Precipitation";
 import { UnitContext } from "./UnitContext";
+import { HourByHour } from "./HourbyHour";
 import { Panel } from "./Panel";
 
 export interface WeatherProps {
@@ -29,6 +30,7 @@ function generateDateString() {
 }
 
 export function WeatherContainer() {
+  
   const [loading, setLoading] = useState(true);
   const [weather, setWeather] = useState<ApiResponse>();
   const [error, setError] = useState("");
@@ -103,6 +105,7 @@ export function WeatherContainer() {
             <CurrentTemp {...weatherProps} />
             <HighsLows {...weatherProps} />
             <Precipitation {...weatherProps} />
+            <HourByHour  {...weatherProps}/>
           </div>
         </div>
       </UnitContext.Provider>

@@ -1,12 +1,13 @@
 :root {
   --text-color: black;
   --background-color: aliceblue;
-  --translucent: #ffffff66;
+  --translucent: #f2f2f2;
   --warmer: #B74F4F;
   --cooler: #4964DD;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 16px;
   font-weight: 300;
+  box-sizing: border-box;
 }
 
 * {
@@ -51,5 +52,20 @@ h1 {
 
 #content {
   padding: 40px;
+  min-width: 400px;
 }
 
+.hour-by-hour, .card {
+  background-color: var(--translucent);
+}
+
+.card-wrapper, .hour-by-hour {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.sticky {
+  position: sticky;
+  left: 0;
+}

@@ -1,12 +1,4 @@
-.hour-by-hour, .card {
-  background-color: var(--translucent);
-}
 
-.card-wrapper, .hour-by-hour {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-}
 
 #card-wrapper {
   display: flex;
@@ -23,12 +15,13 @@
   border-radius: 12px;
 }
 
-.card > h1, .hour-by-hour > h1 {
+.card-head {
   font-size: 1rem;
   font-weight: 500;
   font-variant: all-petite-caps;
   color: #757575;
   margin-bottom: 1rem;
+  position: sticky;
 }
 
 .card > p {

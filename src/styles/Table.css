@@ -1,0 +1,30 @@
+#hourbyhour.card {
+  overflow-x: hidden;
+  flex: 1 1 100%;
+}
+
+.table-overlay {
+  overflow: scroll;
+}
+
+table {
+  text-align: left;
+}
+
+tr {
+  max-width: 600px;
+}
+
+td {
+  text-align: center;
+  scroll-snap-align: start;
+}
+
+td, th {
+  padding: 0 10px 10px 0;
+  background-color: var(--translucent);
+}
+
+th {
+  font-weight: 500;
+}
