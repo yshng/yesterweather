@@ -1,5 +1,5 @@
 import { WeatherProps } from "../components/WeatherContainer";
-import { KEYS, HOURS } from "../util/hours";
+import { KEYS, HOURS } from "../constants/hours";
 
 export function generateTableData(
   field: "feelslike" | "temp",

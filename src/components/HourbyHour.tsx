@@ -4,7 +4,7 @@ import { generateTableData } from "../api/data";
 import { TableData, CellData } from "./TableData";
 import { useState, useMemo } from "react";
 import { Button } from "./Button";
-import { HOURS } from "../util/hours";
+import { HOURS } from "../constants/hours";
 
 type temps = "feelslike" | "temp";
 
