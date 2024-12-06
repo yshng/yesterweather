@@ -8,6 +8,7 @@ import { Precipitation } from "./Precipitation";
 import { UnitContext } from "./UnitContext";
 import { HourByHour } from "./HourbyHour";
 import { Panel } from "./Panel";
+import { Button } from "./Button";
 
 export interface WeatherProps {
   today: Day;
@@ -63,35 +64,35 @@ export function WeatherContainer() {
   // api call
   useEffect(() => {
     if (effectRan.current || process.env.NODE_ENV !== "development") {
-        //   const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
+      //   const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
 
-        //   const endpoint = (days: string) =>
-        //     `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=current%2Chours%2Cdays&key=${key}&contentType=json`;
+      //   const endpoint = (days: string) =>
+      //     `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=current%2Chours%2Cdays&key=${key}&contentType=json`;
 
-        //   fetch(endpoint(generateDateString()), {
-        //     mode: "cors",
-        //   })
-        //     .then((response) => response.json())
-        //     .then((data: ApiResponse) => {
-        //       setWeather(data);
-        //       setFullLocation(data.resolvedAddress);
-        //       console.log("fetched");
-        //       setLoading(false);
-        //     })
-        //     .catch(() => setError("Unable to retrieve weather data."));
-        // }
+      //   fetch(endpoint(generateDateString()), {
+      //     mode: "cors",
+      //   })
+      //     .then((response) => response.json())
+      //     .then((data: ApiResponse) => {
+      //       setWeather(data);
+      //       setFullLocation(data.resolvedAddress);
+      //       console.log("fetched");
+      //       setLoading(false);
+      //     })
+      //     .catch(() => setError("Unable to retrieve weather data."))
+      //     .finally( () => setLoading(false));
+      // }
 
-      fetch('sampleResponse.json')
+      fetch("sampleResponse.json")
         .then((response) => response.json())
         .then((data: ApiResponse) => {
           setWeather(data);
           setFullLocation(data.resolvedAddress);
           console.log("fetched");
-          setLoading(false);
         })
-        .catch(() => setError("Unable to retrieve weather data."));
+        .catch((e: Error) => setError(`${e.name}:  + ${e.message}`))
+        .finally(() => setLoading(false));
     }
-
     effectRan.current = true;
   }, [unitGroup, location]);
 
@@ -120,9 +121,21 @@ export function WeatherContainer() {
             <CurrentTemp {...weatherProps} />
             <HighsLows {...weatherProps} />
             <Precipitation {...weatherProps} />
-            <HourByHour {...weatherProps} />
           </div>
+          <HourByHour {...weatherProps} />
+          <div id="buffer">...</div>
         </div>
+        <div id="units">
+        <Button
+          type="button"
+          content={(unitGroup == "us" ? "F°" : "C°")}
+          id="unit-toggle-button"
+          onClick={() => {
+            toggleUnitGroup();
+          }}
+        />
+      </div>
+
       </UnitContext.Provider>
     </BackgroundImage>
   ) : (

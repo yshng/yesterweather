@@ -1,0 +1,30 @@
+#temp-range {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+#temp-gradient {
+  display: inline-block;
+  width: 10rem;
+  height: 1rem;
+}
+
+#max-temp, #min-temp {
+  font-weight: 500;
+}
+#max-temp {
+  color: var(--warmer);
+}
+
+#min-temp {
+  margin-left: auto;
+  color: var(--cooler);
+}
+
+
+
+
+

@@ -1,6 +1,22 @@
-#hourbyhour.card {
+#hourbyhour {
   overflow-x: hidden;
   flex: 1 1 100%;
+}
+
+.toggle-buttons {
+  display: flex;
+  flex-flow: row nowrap;
+  height: 1.5rem;
+}
+
+.toggle-hour-field {
+  padding: 0 .25rem;
+  border: none;
+}
+
+.toggle-hour-field:disabled {
+  color: black;
+  background-color: lightgray;
 }
 
 .table-overlay {
@@ -8,7 +24,7 @@
 }
 
 table {
-  text-align: left;
+  text-align: center;
 }
 
 tr {
@@ -16,16 +32,12 @@ tr {
 }
 
 td {
-  text-align: center;
-  scroll-snap-align: start;
   font-weight: 600;
 }
 
 th {
-  padding: 0 10px 10px 0;
+  padding: 8px;
   background-color: var(--translucent);
-}
-
-th {
-  font-weight: 500;
+  font-weight: 300;
+  text-align: center;
 }

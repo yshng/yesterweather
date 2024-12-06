@@ -1,8 +1,8 @@
 import { ButtonHTMLAttributes } from "react";
 
-export function Button({ id, content, type, onClick }: ButtonHTMLAttributes<HTMLButtonElement>) {
+export function Button({ disabled, className, id, content, type, onClick }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button type={type} onClick={onClick} id={id}>
+    <button disabled={disabled} className={className} type={type} onClick={onClick} id={id}>
       {content}
     </button>
   );

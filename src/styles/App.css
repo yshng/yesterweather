@@ -2,9 +2,11 @@
   --text-color: black;
   --background-color: aliceblue;
   --translucent: #f2f2f2;
-  --warmer: #B74F4F;
-  --cooler: #4964DD;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --warmer: #b74f4f;
+  --cooler: #4964dd;
+  --header: #757575;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   font-size: 16px;
   font-weight: 300;
   box-sizing: border-box;
@@ -37,13 +39,13 @@ h1 {
   margin-bottom: 2rem;
 }
 
-.warmer, .cooler {
+.warmer,
+.cooler {
   font-weight: 500;
 }
 
 .warmer {
   color: var(--warmer);
-
 }
 
 .cooler {
@@ -55,17 +57,36 @@ h1 {
   min-width: 400px;
 }
 
-.hour-by-hour, .card {
+#hourbyhour,
+.card {
   background-color: var(--translucent);
+  padding: 20px;
+  border-radius: 12px;
 }
 
-.card-wrapper, .hour-by-hour {
+#card-wrapper,
+#hourbyhour {
+  box-sizing: border-box;
   width: 100%;
   max-width: 600px;
-  margin: 0 auto;
+  margin: 20px 0;
 }
 
 .sticky {
   position: sticky;
   left: 0;
+}
+
+#buffer {
+  display: block;
+  height: 10rem;
+}
+
+.row {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.space-between {
+  justify-content: space-between;
 }

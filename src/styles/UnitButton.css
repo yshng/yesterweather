@@ -1,0 +1,14 @@
+div#units {
+  display: flex;
+  align-items: start;
+  position: sticky;
+  top: 5%;
+  right: 10%;
+}
+
+#unit-toggle-button {
+  display: inline-block;
+  text-transform: capitalize;
+  border-radius: 10px;
+  height: 2rem;
+}
