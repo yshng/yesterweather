@@ -17,18 +17,18 @@ export interface WeatherProps {
   current: CurrentConditions;
 }
 
-// function formatDate(date: Date) {
-//   return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-");
-// }
+function formatDate(date: Date) {
+  return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-");
+}
 
-// function generateDateString() {
-//   const now = new Date();
-//   now.setDate(now.getDate() - 1);
-//   const yesterday = formatDate(now);
-//   now.setDate(now.getDate() + 2);
-//   const tomorrow = formatDate(now);
-//   return yesterday + "/" + tomorrow;
-// }
+function generateDateString() {
+  const now = new Date();
+  now.setDate(now.getDate() - 1);
+  const yesterday = formatDate(now);
+  now.setDate(now.getDate() + 2);
+  const tomorrow = formatDate(now);
+  return yesterday + "/" + tomorrow;
+}
 
 export function WeatherContainer() {
   const [loading, setLoading] = useState(true);
@@ -64,34 +64,35 @@ export function WeatherContainer() {
   // api call
   useEffect(() => {
     if (effectRan.current || process.env.NODE_ENV !== "development") {
-      //   const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
+        const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
 
-      //   const endpoint = (days: string) =>
-      //     `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=current%2Chours%2Cdays&key=${key}&contentType=json`;
+        const endpoint = (days: string) =>
+          `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=current%2Chours%2Cdays&key=${key}&contentType=json`;
 
-      //   fetch(endpoint(generateDateString()), {
-      //     mode: "cors",
-      //   })
-      //     .then((response) => response.json())
-      //     .then((data: ApiResponse) => {
-      //       setWeather(data);
-      //       setFullLocation(data.resolvedAddress);
-      //       console.log("fetched");
-      //       setLoading(false);
-      //     })
-      //     .catch(() => setError("Unable to retrieve weather data."))
-      //     .finally( () => setLoading(false));
-      // }
-
-      fetch("sampleResponse.json")
-        .then((response) => response.json())
-        .then((data: ApiResponse) => {
-          setWeather(data);
-          setFullLocation(data.resolvedAddress);
-          console.log("fetched");
+        fetch(endpoint(generateDateString()), {
+          mode: "cors",
         })
-        .catch((e: Error) => setError(`${e.name}:  + ${e.message}`))
-        .finally(() => setLoading(false));
+          .then((response) => response.json())
+          .then((data: ApiResponse) => {
+            setWeather(data);
+            setFullLocation(data.resolvedAddress);
+            console.log("fetched");
+            setLoading(false);
+          })
+          .catch(() => setError("Unable to retrieve weather data."))
+          .finally( () => setLoading(false));
+      
+
+      // fetch("sampleResponse.json")
+      //   .then((response) => response.json())
+      //   .then((data: ApiResponse) => {
+      //     setWeather(data);
+      //     setFullLocation(data.resolvedAddress);
+      //     console.log("fetched");
+      //   })
+      //   .catch((e: Error) => setError(`${e.name}:  + ${e.message}`))
+      //   .finally(() => setLoading(false));
+      
     }
     effectRan.current = true;
   }, [unitGroup, location]);
