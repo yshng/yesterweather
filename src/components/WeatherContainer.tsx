@@ -16,21 +16,20 @@ export interface WeatherProps {
   current: CurrentConditions;
 }
 
-function formatDate(date: Date) {
-  return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-");
-}
+// function formatDate(date: Date) {
+//   return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-");
+// }
 
-function generateDateString() {
-  const now = new Date();
-  now.setDate(now.getDate() - 1);
-  const yesterday = formatDate(now);
-  now.setDate(now.getDate() + 2);
-  const tomorrow = formatDate(now);
-  return yesterday + "/" + tomorrow;
-}
+// function generateDateString() {
+//   const now = new Date();
+//   now.setDate(now.getDate() - 1);
+//   const yesterday = formatDate(now);
+//   now.setDate(now.getDate() + 2);
+//   const tomorrow = formatDate(now);
+//   return yesterday + "/" + tomorrow;
+// }
 
 export function WeatherContainer() {
-  
   const [loading, setLoading] = useState(true);
   const [weather, setWeather] = useState<ApiResponse>();
   const [error, setError] = useState("");
@@ -64,14 +63,25 @@ export function WeatherContainer() {
   // api call
   useEffect(() => {
     if (effectRan.current || process.env.NODE_ENV !== "development") {
-      const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
+        //   const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
 
-      const endpoint = (days: string) =>
-        `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=current%2Chours%2Cdays&key=${key}&contentType=json`;
+        //   const endpoint = (days: string) =>
+        //     `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=current%2Chours%2Cdays&key=${key}&contentType=json`;
 
-      fetch(endpoint(generateDateString()), {
-        mode: "cors",
-      })
+        //   fetch(endpoint(generateDateString()), {
+        //     mode: "cors",
+        //   })
+        //     .then((response) => response.json())
+        //     .then((data: ApiResponse) => {
+        //       setWeather(data);
+        //       setFullLocation(data.resolvedAddress);
+        //       console.log("fetched");
+        //       setLoading(false);
+        //     })
+        //     .catch(() => setError("Unable to retrieve weather data."));
+        // }
+
+      fetch('sampleResponse.json')
         .then((response) => response.json())
         .then((data: ApiResponse) => {
           setWeather(data);
@@ -99,13 +109,18 @@ export function WeatherContainer() {
       <UnitContext.Provider value={units}>
         <div id="content">
           <h1>YesterWeather</h1>
-          <Panel location={fullLocation} unitGroup={unitGroup} onClick={toggleUnitGroup} onSubmit={setLocation}/>
+          <Panel
+            location={fullLocation}
+            unitGroup={unitGroup}
+            onClick={toggleUnitGroup}
+            onSubmit={setLocation}
+          />
           <div id="card-wrapper">
             <Summary {...weatherProps} />
             <CurrentTemp {...weatherProps} />
             <HighsLows {...weatherProps} />
             <Precipitation {...weatherProps} />
-            <HourByHour  {...weatherProps}/>
+            <HourByHour {...weatherProps} />
           </div>
         </div>
       </UnitContext.Provider>

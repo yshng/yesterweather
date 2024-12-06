@@ -1,56 +1,67 @@
 import { WeatherProps } from "./WeatherContainer";
 import { Card } from "./Card";
+import { generateTableData } from "../api/data";
+import { TableData, CellData } from "./TableData";
+import { useState, useMemo } from "react";
+import { Button } from "./Button";
+import { HOURS } from "../util/hours";
 
-export function HourByHour({ yesterday, today, tomorrow }: WeatherProps) {
+type temps = "feelslike" | "temp";
+
+export function HourByHour(weather: WeatherProps) {
   // const units = useContext(UnitContext);
 
-  // create hour headers
-  function numberToHour(n: number) {
-    if (n == 0) return "12AM";
-    else if (n < 12) return n.toString() + "AM";
-    else if (n == 12) return "12PM";
-    else return (n - 12).toString() + "PM";
-  }
+  const [field, setField] = useState<temps>("feelslike");
+  const {
+    temps,
+    extremes: [MIN, MAX],
+  } = useMemo(() => generateTableData(field, weather), [field, weather]);
 
-  const keys = [...Array(24).keys()];
-  const hours = keys.map((num) => numberToHour(num));
+  function makeKey(headers: string) {
+    return headers.slice(0, 3) + headers.split(" ")[1];
+  }
+  function tableDataProps(data: CellData) {
+    return { ...data, min: MIN, max: MAX };
+  }
 
   return (
     <Card id="hourbyhour" header="Hour By Hour">
+      <Button
+        onClick={() => setField("feelslike")}
+        disabled={field == "feelslike"}
+        content="Perceived"
+      />
+      <Button
+        onClick={() => setField("temp")}
+        disabled={field == "temp"}
+        content="Actual"
+      />
+
       <div className="table-overlay">
         <table>
           <thead>
             <tr>
-              <th scope="col" className="sticky">
-              </th>
-              {hours.map((hour) => (
-                <th key={hour} scope="col">
+              <th scope="col" className="sticky"></th>
+              {HOURS.map((hour) => (
+                <th id={hour} key={hour} scope="col">
                   {hour}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th className="sticky">Yesterday</th>
-              {yesterday.hours.map((hour) => (
-                <td key={hour.datetime}>{hour.feelslike}</td>
-              ))}
-            </tr>
-            <tr>
-              <th className="sticky">Today</th>
-              {today.hours.map((hour) => (
-                <td key={hour.datetime}>{hour.feelslike}</td>
-              ))}
-            </tr>
-            <tr>
-              <th className="sticky">Tomorrow</th>
-              {tomorrow.hours.map((hour) => (
-                <td key={hour.datetime}>{hour.feelslike}</td>
-              ))}
-            </tr>
-
-
+            {temps.map((temp) => {
+              return (
+                <tr key={temp.day}>
+                  <th className="sticky" id={temp.day}>
+                    {temp.day}
+                  </th>
+                  {temp.data.map((data) => (
+                    <TableData key={makeKey(data.headers)} {...tableDataProps(data)} />
+                  ))}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
