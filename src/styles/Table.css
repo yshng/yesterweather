@@ -21,10 +21,14 @@
 
 .table-overlay {
   overflow: scroll;
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
 }
 
 table {
   text-align: center;
+  margin-bottom: 1rem;
+  overscroll-behavior: contain;
 }
 
 tr {
