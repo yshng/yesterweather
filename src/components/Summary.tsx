@@ -12,7 +12,7 @@ export function Summary( {yesterday,today, tomorrow}: WeatherProps) {
     <Card header="today" id="summary">
       <p>{today.description} High of {today.feelslikemax}{units.temp} [{today.tempmax}], low of {today.feelslikemin}{units.temp} [{today.tempmin}].</p>
 
-      <p>On average, today will feel <CompareTemp difference={today.feelslike-yesterday.feelslike} /> than yesterday, and <CompareTemp difference={today.feelslike-tomorrow.feelslike} /> than tomorrow.</p>
+      <p>On average, today will feel <CompareTemp difference={today.feelslike-yesterday.feelslike} /> yesterday, and <CompareTemp difference={today.feelslike-tomorrow.feelslike} /> tomorrow.</p>
     </Card>
     )
 }

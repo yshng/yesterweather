@@ -63,3 +63,10 @@ export function generateTableData(
     extremes: [MIN, MAX],
   };
 }
+
+
+import { CurrentConditions } from "../api/api";
+
+export function getHour(current: CurrentConditions) {
+  return Number(current.datetime.slice(0, 2));
+}

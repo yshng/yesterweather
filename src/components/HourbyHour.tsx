@@ -6,6 +6,7 @@ import { Button } from "./Button";
 import { HOURS } from "../constants/hours";
 import { TempRange } from "./TempRange";
 
+
 type temps = "feelslike" | "temp";
 
 export function HourByHour(weather: WeatherProps) {
@@ -51,7 +52,7 @@ export function HourByHour(weather: WeatherProps) {
             <tr>
               <th scope="col" className="sticky"></th>
               {HOURS.map((hour) => (
-                <th id={hour} key={hour} scope="col">
+                <th id={"h" + hour} key={hour} scope="col">
                   {hour}
                 </th>
               ))}

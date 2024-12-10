@@ -3,11 +3,13 @@ import { CompareTemp } from "./CompareTemp";
 import { useContext } from "react";
 import { UnitContext } from "./UnitContext";
 import { WeatherProps } from "./WeatherContainer";
+import { getHour } from "../api/data";
 
 export function CurrentTemp({ tomorrow, yesterday, current }: WeatherProps) {
   const units = useContext(UnitContext);
 
-  const hour = Number(current.datetime.slice(0, 2));
+  const hour = getHour(current);
+
   return (
     <Card header="current conditions" id="current">
       {current.feelslike && (
@@ -18,14 +20,14 @@ export function CurrentTemp({ tomorrow, yesterday, current }: WeatherProps) {
             <CompareTemp
               difference={current.feelslike - yesterday.hours[hour].feelslike}
             />{" "}
-            than approximately this time yesterday.
+             approximately this time yesterday.
           </p>
           <p>
             Tommorrow, around this time, it should be
             <CompareTemp
               difference={tomorrow.hours[hour].feelslike - current.feelslike}
             />
-            than today.
+             today.
           </p>
         </>
       )}
