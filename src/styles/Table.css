@@ -21,8 +21,7 @@
 
 .table-overlay {
   overflow: scroll;
-  scrollbar-width: thin;
-  overscroll-behavior-x: contain;
+  overscroll-behavior: contain;
 }
 
 table {
