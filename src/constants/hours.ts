@@ -1,4 +1,4 @@
-function numberToHour(n: number) {
+export function numberToHour(n: number) {
   if (n == 0) return "12AM";
   else if (n < 12) return n.toString() + "AM";
   else if (n == 12) return "12PM";
