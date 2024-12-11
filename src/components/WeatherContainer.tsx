@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import { Day, CurrentConditions, ApiResponse } from "../api/api";
 import { CurrentTemp } from "./CurrentTemp";
 import { BackgroundImage } from "./BackgroundImage";
@@ -7,8 +7,9 @@ import { Summary } from "./Summary";
 import { Precipitation } from "./Precipitation";
 import { UnitContext } from "./UnitContext";
 import { HourByHour } from "./HourbyHour";
-import { Panel } from "./Panel";
 import { Button } from "./Button";
+import { LocationInput } from "./LocationInput";
+import { useQuery } from "@tanstack/react-query";
 
 export interface WeatherProps {
   today: Day;
@@ -31,17 +32,12 @@ function generateDateString() {
 }
 
 export function WeatherContainer() {
-  const [loading, setLoading] = useState(true);
-  const [weather, setWeather] = useState<ApiResponse>();
-  const [error, setError] = useState("");
-  const [fullLocation, setFullLocation] = useState("");
-
   const initialLocation =
     localStorage.getItem("yesterweather_location") || "chicago";
-  const [location, setLocation] = useState(initialLocation);
   const initialUnitGroup =
     localStorage.getItem("yesterweather_unitGroup") || "us";
 
+  const [location, setLocation] = useState(initialLocation);
   const [unitGroup, setUnitGroup] = useState(initialUnitGroup);
 
   function toggleUnitGroup() {
@@ -54,69 +50,57 @@ export function WeatherContainer() {
     }
   }
 
+  async function fetchWeather(): Promise<ApiResponse> {
+    const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
+
+    const endpoint = (days: string) =>
+      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=current%2Chours%2Cdays&key=${key}&contentType=json`;
+
+    const data = await fetch(endpoint(generateDateString()), {
+      mode: "cors",
+    }).then((response) => {
+      console.log("fetched");
+      return response.json();
+    });
+
+    return data;
+  }
+
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ["weather", unitGroup, location],
+    staleTime: 30000,
+    queryFn: fetchWeather,
+  });
+
   const units =
     unitGroup == "us"
       ? { temp: "°F", depth: { unit: "inch", plural: "inches" } }
       : { temp: "°C", depth: { unit: "mm", plural: "mms" } };
 
-  const effectRan = useRef(false);
+  if (isPending || isError) {
+    return (
+      <div id="wrapper">
+        {isPending && <p>Loading weather data...</p>}
+        {isError && (
+          <p>{"An error has occurred: " + error.name + error.message}</p>
+        )}
+      </div>
+    );
+  }
 
-  // api call
-  useEffect(() => {
-    if (effectRan.current || process.env.NODE_ENV !== "development") {
-        const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
+  const weatherProps = {
+    yesterday: data.days[0],
+    current: data.currentConditions,
+    today: data.days[1],
+    tomorrow: data.days[2],
+  };
 
-        const endpoint = (days: string) =>
-          `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=current%2Chours%2Cdays&key=${key}&contentType=json`;
-
-        fetch(endpoint(generateDateString()), {
-          mode: "cors",
-        })
-          .then((response) => response.json())
-          .then((data: ApiResponse) => {
-            setWeather(data);
-            setFullLocation(data.resolvedAddress);
-            console.log("fetched");
-            setLoading(false);
-          })
-          .catch(() => setError("Unable to retrieve weather data."))
-          .finally( () => setLoading(false));
-      
-
-      // fetch("sampleResponse.json")
-      //   .then((response) => response.json())
-      //   .then((data: ApiResponse) => {
-      //     setWeather(data);
-      //     setFullLocation(data.resolvedAddress);
-      //     console.log("fetched");
-      //   })
-      //   .catch((e: Error) => setError(`${e.name}:  + ${e.message}`))
-      //   .finally(() => setLoading(false));
-      
-    }
-    effectRan.current = true;
-  }, [unitGroup, location]);
-
-  const weatherProps = weather
-    ? {
-        yesterday: weather.days[0],
-        current: weather.currentConditions,
-        today: weather.days[1],
-        tomorrow: weather.days[2],
-      }
-    : null;
-
-  return weatherProps ? (
+  return (
     <BackgroundImage current={weatherProps.current}>
       <UnitContext.Provider value={units}>
         <div id="content">
           <h1>YesterWeather</h1>
-          <Panel
-            location={fullLocation}
-            unitGroup={unitGroup}
-            onClick={toggleUnitGroup}
-            onSubmit={setLocation}
-          />
+          <LocationInput value={data.resolvedAddress} onSubmit={setLocation} />
           <div id="card-wrapper">
             <Summary {...weatherProps} />
             <CurrentTemp {...weatherProps} />
@@ -127,22 +111,16 @@ export function WeatherContainer() {
           <div id="buffer">...</div>
         </div>
         <div id="units">
-        <Button
-          type="button"
-          content={(unitGroup == "us" ? "F°" : "C°")}
-          id="unit-toggle-button"
-          onClick={() => {
-            toggleUnitGroup();
-          }}
-        />
-      </div>
-
+          <Button
+            type="button"
+            content={unitGroup == "us" ? "°F" : "°C"}
+            id="unit-toggle-button"
+            onClick={() => {
+              toggleUnitGroup();
+            }}
+          />
+        </div>
       </UnitContext.Provider>
     </BackgroundImage>
-  ) : (
-    <div id="wrapper">
-      {loading && <p>Loading weather data...</p>}
-      {error && <p>{error}</p>}
-    </div>
   );
 }
