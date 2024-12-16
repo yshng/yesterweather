@@ -1,17 +1,14 @@
 import { WeatherProps } from "./WeatherContainer";
 import { generateTableData } from "../api/data";
 import { TableData, CellData } from "./TableData";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Button } from "./Button";
-import { HOURS } from "../constants/hours";
+import { HOURS, numberToHour } from "../constants/constants";
 import { TempRange } from "./TempRange";
-
 
 type temps = "feelslike" | "temp";
 
 export function HourByHour(weather: WeatherProps) {
-  // const units = useContext(UnitContext);
-
   const [field, setField] = useState<temps>("feelslike");
   const {
     temps,
@@ -24,6 +21,15 @@ export function HourByHour(weather: WeatherProps) {
   function tableDataProps(data: CellData) {
     return { ...data, min: MIN, max: MAX };
   }
+
+  const scrollRef = useRef<HTMLTableCellElement>(null);
+  const now = numberToHour(new Date().getHours());
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ inline: "center" });
+    }
+  });
 
   return (
     <div id="hourbyhour">
@@ -52,7 +58,7 @@ export function HourByHour(weather: WeatherProps) {
             <tr>
               <th scope="col" className="sticky"></th>
               {HOURS.map((hour) => (
-                <th id={"h" + hour} key={hour} scope="col">
+                <th key={hour} ref={hour == now ? scrollRef : null} scope="col">
                   {hour}
                 </th>
               ))}
