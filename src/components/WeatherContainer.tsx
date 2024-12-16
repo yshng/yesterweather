@@ -9,27 +9,16 @@ import { UnitContext } from "./UnitContext";
 import { HourByHour } from "./HourbyHour";
 import { Button } from "./Button";
 import { LocationInput } from "./LocationInput";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
+import { differenceInMilliseconds } from "date-fns";
+import { midnight } from "../constants/constants";
 
 export interface WeatherProps {
   today: Day;
   tomorrow: Day;
   yesterday: Day;
   current: CurrentConditions;
-}
-
-function formatDate(date: Date) {
-  return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-");
-}
-
-function generateDateString() {
-  const now = new Date();
-  now.setDate(now.getDate() - 1);
-  const yesterday = formatDate(now);
-  now.setDate(now.getDate() + 2);
-  const tomorrow = formatDate(now);
-  return yesterday + "/" + tomorrow;
-}
+} 
 
 export function WeatherContainer() {
   const initialLocation =
@@ -50,13 +39,17 @@ export function WeatherContainer() {
     }
   }
 
-  async function fetchWeather(): Promise<ApiResponse> {
-    const key = "FQNNDH99DKU5EPWAR5GGXRSN6";
+  async function fetchWeather(day: string): Promise<ApiResponse> {
+    const key = "AD6ZKJQSYHRB39KM7DNWKBCS9";
 
-    const endpoint = (days: string) =>
-      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/${days}?unitGroup=${unitGroup}&include=current%2Chours%2Cdays&key=${key}&contentType=json`;
+    const forecast = 
+      `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}?unitGroup=us&include=current%2Cdays%2Chours&key=${key}`;
 
-    const data = await fetch(endpoint(generateDateString()), {
+    const yesterday = 
+    `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}/yesterday?unitGroup=us&include=days%2Chours&key=${key}`;
+     
+
+    const data = await fetch(day == "yesterday" ? yesterday : forecast, {
       mode: "cors",
     }).then((response) => {
       console.log("fetched");
@@ -66,10 +59,27 @@ export function WeatherContainer() {
     return data;
   }
 
-  const { isPending, isError, data, error } = useQuery({
-    queryKey: ["weather", unitGroup, location],
-    staleTime: 30000,
-    queryFn: fetchWeather,
+  const {isPending, errors, yesterday, forecast} = useQueries({
+    queries: [
+      {
+        queryKey: ["yesterday", unitGroup, location],
+        staleTime: differenceInMilliseconds(midnight(new Date()), new Date()),
+        queryFn: () => fetchWeather("yesterday"),
+      },
+      {
+        queryKey: ["forecast", unitGroup, location],
+        staleTime: 10000,
+        queryFn: () => fetchWeather("forecast"),
+      },
+    ],
+    combine: (results) => {
+      return {
+        isPending: results.some( (result) => result.isPending ),
+        errors: results.reduce( (acc: Error[],result) => {if (result.isError) {acc.push(result.error)} return acc}, []),
+        yesterday: results[0].data,
+        forecast: results[1].data
+      }
+    }
   });
 
   const units =
@@ -77,30 +87,31 @@ export function WeatherContainer() {
       ? { temp: "°F", depth: { unit: "inch", plural: "inches" } }
       : { temp: "°C", depth: { unit: "mm", plural: "mms" } };
 
-  if (isPending || isError) {
+  if (isPending || errors.length) {
     return (
       <div id="wrapper">
         {isPending && <p>Loading weather data...</p>}
-        {isError && (
+        {errors.length && (
+          errors.map( (error) => 
           <p>{"An error has occurred: " + error.name + error.message}</p>
-        )}
+        ))}
       </div>
     );
   }
 
-  const weatherProps = {
-    yesterday: data.days[0],
-    current: data.currentConditions,
-    today: data.days[1],
-    tomorrow: data.days[2],
-  };
+  const weatherProps = yesterday && forecast ? {
+    yesterday: yesterday.days[0],
+    current: forecast.currentConditions,
+    today: forecast.days[0],
+    tomorrow: forecast.days[1],
+  } : null;
 
-  return (
+  return ( yesterday && weatherProps &&
     <BackgroundImage current={weatherProps.current}>
       <UnitContext.Provider value={units}>
         <div id="content">
           <h1>YesterWeather</h1>
-          <LocationInput value={data.resolvedAddress} onSubmit={setLocation} />
+          <LocationInput value={yesterday.resolvedAddress} onSubmit={setLocation} />
           <div id="card-wrapper">
             <Summary {...weatherProps} />
             <CurrentTemp {...weatherProps} />
