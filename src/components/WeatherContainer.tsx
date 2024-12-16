@@ -11,7 +11,7 @@ import { Button } from "./Button";
 import { LocationInput } from "./LocationInput";
 import { useQueries } from "@tanstack/react-query";
 import { differenceInMilliseconds } from "date-fns";
-import { midnight } from "../constants/constants";
+import { midnight } from "../util/time";
 
 export interface WeatherProps {
   today: Day;

@@ -3,7 +3,7 @@ import { generateTableData } from "../api/data";
 import { TableData, CellData } from "./TableData";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Button } from "./Button";
-import { HOURS, numberToHour } from "../constants/constants";
+import { HOURS, numberToHour } from "../util/constants";
 import { TempRange } from "./TempRange";
 
 type temps = "feelslike" | "temp";
