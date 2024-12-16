@@ -11,9 +11,8 @@ export function LocationInput({ value, onSubmit }: InputProps) {
   return (
     <form
       id="location-form"
-      onSubmit={(e) => {
-        e.preventDefault();
-        localStorage.setItem("location",input);
+      onSubmit={() => {
+        localStorage.setItem("yesterweather_location",input);
         onSubmit(input);
       }}
     >
