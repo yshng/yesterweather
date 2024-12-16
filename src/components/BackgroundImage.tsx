@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import useImage from "../hooks/useImage";
 import { CurrentConditions } from "../api/api";
+import { dayOrNight } from "../util/time";
 
 function determineBackgroundImage(
   icon: string,
@@ -28,11 +29,10 @@ function determineBackgroundImage(
 
   // current epoch time without milliseconds
   const now = Number(Date.now().toString().slice(0,10));
-  const result = (now < sunset && now > sunrise)
-    ? condition + "-day"
-    : condition + "-night"
-  return result;
+  condition = condition + dayOrNight(now, sunrise, sunset);
+  return condition;
 }
+  
 
 interface BackgroundImageProps {
   current: CurrentConditions,
