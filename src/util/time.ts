@@ -6,8 +6,13 @@ export function midnight(day: Date) {
   return day;
 } 
 
-export function dayOrNight(time: number, sunrise: number, sunset: number) {
-  return (time < sunset && time > sunrise)
-  ?  "day"
-  :  "night" 
+export function isDay(time: number, sunrise: number, sunset: number) {
+  const trimmed = trimMS(time);
+  const result = (trimmed > sunrise && trimmed < sunset);
+  return result;
+}
+
+// return unix time in seconds (no milliseconds)
+function trimMS(epoch: number) {
+  return Number(epoch.toString().slice(0,10));
 }

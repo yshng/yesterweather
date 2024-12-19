@@ -18,6 +18,7 @@ button[type="button"],button[type="submit"] {
 label {
   font-size: inherit;
   height: 100%;
+  color: var(--h1);
 }
 
 input { 
